@@ -1,0 +1,5 @@
+[project]
+name = "drug-detection"
+
+[environments]
+production.services = ["server", "client", "ai-service"] 
