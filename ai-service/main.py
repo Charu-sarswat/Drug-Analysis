@@ -6,10 +6,13 @@ import urllib.parse
 
 app = FastAPI()
 
-# Enable CORS with specific origins
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5000"],
+    allow_origins=[
+        "https://drug-detection.onrender.com",
+        "https://drug-analysis-backend.onrender.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

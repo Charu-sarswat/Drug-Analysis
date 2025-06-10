@@ -3,20 +3,18 @@ import { Form, Button, Card, Alert, Spinner, Table, Tooltip, OverlayTrigger, Bad
 import axios from 'axios';
 import { FaInfoCircle, FaFlask, FaDna, FaChartLine, FaExternalLinkAlt, FaDatabase, FaPills } from 'react-icons/fa';
 
-const API_URL = 'https://drug-analysis-backend.onrender.com';
-
 function DrugAnalysis() {
   const [drugName, setDrugName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [errorDetails, setErrorDetails] = useState(null);
   const [results, setResults] = useState(null);
+
+  const API_URL = 'https://drug-analysis-backend.onrender.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setErrorDetails(null);
     setResults(null);
 
     try {
@@ -28,10 +26,11 @@ function DrugAnalysis() {
       setResults(response.data);
     } catch (error) {
       console.error('Analysis error:', error);
-      setError(error.response?.data?.error || 'An error occurred while analyzing the drug. Please try again later.');
-      if (error.response?.data?.suggestions) {
-        setErrorDetails(error.response.data);
-      }
+      setError(
+        error.response?.data?.error ||
+        error.message ||
+        'An error occurred while analyzing the drug. Please try again later.'
+      );
     } finally {
       setLoading(false);
     }
@@ -124,11 +123,11 @@ function DrugAnalysis() {
         <Alert variant="danger" className="mb-4">
           <Alert.Heading>Analysis Error</Alert.Heading>
           <p>{error}</p>
-          {errorDetails?.suggestions && (
+          {error.response?.data?.suggestions && (
             <div className="mt-3">
               <h6>Suggestions:</h6>
               <ul className="mb-0">
-                {errorDetails.suggestions.map((suggestion, index) => (
+                {error.response.data.suggestions.map((suggestion, index) => (
                   <li key={index}>{suggestion}</li>
                 ))}
               </ul>

@@ -5,11 +5,12 @@ const cors = require('cors');
 const axios = require('axios');
 
 const app = express();
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+const AI_SERVICE_URL = 'https://drug-analysis-ai.onrender.com';
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/drug-analysis')
@@ -97,7 +98,7 @@ app.post('/api/predict', async (req, res) => {
     const isAIServiceAvailable = await checkAIService();
     if (!isAIServiceAvailable) {
       return res.status(503).json({
-        error: 'AI Service is not available. Please try again later.'
+        error: 'AI Service is not available. Please make sure the Python service is running on port 8000.'
       });
     }
 
