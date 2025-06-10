@@ -17,7 +17,7 @@ function DrugAnalysis() {
 
     try {
       console.log('Submitting analysis for:', drugName);
-      const response = await axios.post('http://localhost:5000/api/predict', {
+      const response = await axios.post('https://drug-analysis-backend.onrender.com/api/predict', {
         drugName: drugName.trim()
       });
       console.log('Received response:', response.data);
