@@ -1,5 +1,5 @@
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import urllib.parse
@@ -283,6 +283,21 @@ def get_qr_code_url(url: str):
 @app.get("/")
 async def root():
     return {"message": "AI Service is running"}
+
+@app.post("/analysis")
+async def analyze_drug(request: Request):
+    try:
+        data = await request.json()
+        smiles = data.get("smiles")
+        cid = data.get("cid")
+        
+        if not smiles or not cid:
+            raise HTTPException(status_code=400, detail="Missing SMILES or CID")
+            
+        # Your existing analysis logic here
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/predict")
 async def predict_properties(drug_input: DrugInput):

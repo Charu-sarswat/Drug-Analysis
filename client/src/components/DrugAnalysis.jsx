@@ -9,7 +9,7 @@ function DrugAnalysis() {
   const [error, setError] = useState('');
   const [results, setResults] = useState(null);
 
-  const API_URL = 'https://drug-analysis-backend.onrender.com';
+  const API_URL = 'https://drug-analysis-backend.onrender.com/api';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,18 +19,26 @@ function DrugAnalysis() {
 
     try {
       console.log('Submitting analysis for:', drugName);
-      const response = await axios.post(`${API_URL}/api/predict`, {
+      const response = await axios.post(`${API_URL}/analysis`, {
         drugName: drugName.trim()
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       console.log('Received response:', response.data);
       setResults(response.data);
     } catch (error) {
       console.error('Analysis error:', error);
-      setError(
-        error.response?.data?.error ||
-        error.message ||
-        'An error occurred while analyzing the drug. Please try again later.'
-      );
+      let errorMessage = 'An error occurred while analyzing the drug. Please try again later.';
+      if (error.response) {
+        if (error.response.status === 404) {
+          errorMessage = 'The analysis service is not available. Please try again later.';
+        } else if (error.response.data?.error) {
+          errorMessage = error.response.data.error;
+        }
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -92,13 +92,13 @@ const tryNameVariations = async (drugName) => {
 };
 
 // Routes
-app.post('/api/predict', async (req, res) => {
+app.post('/api/analysis', async (req, res) => {
   try {
     // Check if AI service is available
     const isAIServiceAvailable = await checkAIService();
     if (!isAIServiceAvailable) {
       return res.status(503).json({
-        error: 'AI Service is not available. Please make sure the Python service is running on port 8000.'
+        error: 'AI Service is not available. Please try again later.'
       });
     }
 
@@ -107,7 +107,7 @@ app.post('/api/predict', async (req, res) => {
       return res.status(400).json({ error: 'Invalid drug name provided' });
     }
 
-    console.log(`Processing prediction request for drug: ${drugName}`);
+    console.log(`Processing analysis request for drug: ${drugName}`);
 
     // Try to get CID with name variations
     let pubchemResponse = await tryNameVariations(drugName);
