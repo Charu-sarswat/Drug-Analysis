@@ -3,28 +3,35 @@ import { Form, Button, Card, Alert, Spinner, Table, Tooltip, OverlayTrigger, Bad
 import axios from 'axios';
 import { FaInfoCircle, FaFlask, FaDna, FaChartLine, FaExternalLinkAlt, FaDatabase, FaPills } from 'react-icons/fa';
 
+const API_URL = 'https://drug-analysis-backend.onrender.com';
+
 function DrugAnalysis() {
   const [drugName, setDrugName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errorDetails, setErrorDetails] = useState(null);
   const [results, setResults] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setErrorDetails(null);
     setResults(null);
 
     try {
       console.log('Submitting analysis for:', drugName);
-      const response = await axios.post('https://drug-analysis-backend.onrender.com/api/predict', {
+      const response = await axios.post(`${API_URL}/api/predict`, {
         drugName: drugName.trim()
       });
       console.log('Received response:', response.data);
       setResults(response.data);
-    } catch (err) {
-      console.error('Analysis error:', err);
-      setError(err.response?.data?.error || 'An error occurred while analyzing the drug');
+    } catch (error) {
+      console.error('Analysis error:', error);
+      setError(error.response?.data?.error || 'An error occurred while analyzing the drug. Please try again later.');
+      if (error.response?.data?.suggestions) {
+        setErrorDetails(error.response.data);
+      }
     } finally {
       setLoading(false);
     }
@@ -117,11 +124,11 @@ function DrugAnalysis() {
         <Alert variant="danger" className="mb-4">
           <Alert.Heading>Analysis Error</Alert.Heading>
           <p>{error}</p>
-          {err.response?.data?.suggestions && (
+          {errorDetails?.suggestions && (
             <div className="mt-3">
               <h6>Suggestions:</h6>
               <ul className="mb-0">
-                {err.response.data.suggestions.map((suggestion, index) => (
+                {errorDetails.suggestions.map((suggestion, index) => (
                   <li key={index}>{suggestion}</li>
                 ))}
               </ul>

@@ -5,6 +5,7 @@ const cors = require('cors');
 const axios = require('axios');
 
 const app = express();
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
 // Middleware
 app.use(cors());
@@ -54,7 +55,7 @@ const retryOperation = async (operation, maxRetries = 3) => {
 // Check AI service health
 const checkAIService = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/');
+    const response = await axios.get(`${AI_SERVICE_URL}/`);
     console.log('AI Service Status:', response.data.message);
     return true;
   } catch (error) {
@@ -96,7 +97,7 @@ app.post('/api/predict', async (req, res) => {
     const isAIServiceAvailable = await checkAIService();
     if (!isAIServiceAvailable) {
       return res.status(503).json({
-        error: 'AI Service is not available. Please make sure the Python service is running on port 8000.'
+        error: 'AI Service is not available. Please try again later.'
       });
     }
 
@@ -160,7 +161,7 @@ app.post('/api/predict', async (req, res) => {
     let aiResponse;
     try {
       aiResponse = await retryOperation(async () => {
-        const response = await axios.post('http://127.0.0.1:8000/predict', {
+        const response = await axios.post(`${AI_SERVICE_URL}/predict`, {
           smiles,
           cid: cid.toString()
         });
